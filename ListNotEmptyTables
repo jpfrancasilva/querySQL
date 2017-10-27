@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION tabelasnaovazias()
     AS $BODY$
      DECLARE
   rec RECORD;
-  quant integer;
+  quant bigint;
  
   BEGIN
   --caso esteja usando uma versão do pg que implemente
@@ -12,7 +12,8 @@ CREATE OR REPLACE FUNCTION tabelasnaovazias()
   
 	drop table if exists tabelas_nao_vazias;
 	create table tabelas_nao_vazias(
-		nome_tabela varchar(100)
+		nome_tabela varchar(100),
+		quantidade bigint
 	);
 	DELETE FROM tabelas_nao_vazias;
   
@@ -26,7 +27,7 @@ CREATE OR REPLACE FUNCTION tabelasnaovazias()
     execute 'SELECT count(*) FROM ' || rec.table_name INTO quant;
     
     IF quant <> 0 then
-      INSERT INTO tabelas_nao_vazias values (rec.table_name);
+      INSERT INTO tabelas_nao_vazias values (rec.table_name, quant);
       quant := 0;
     ELSE 
       quant := 0;
