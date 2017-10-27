@@ -1,0 +1,40 @@
+CREATE OR REPLACE FUNCTION tabelasvazias()
+    RETURNS void
+    AS $BODY$
+     DECLARE
+  rec RECORD;
+  quant integer;
+ 
+  BEGIN
+	drop table if exists tabelas_vazias;
+	create table tabelas_vazias(
+		nome_tabela varchar(100)
+	);
+	DELETE FROM tabelas_vazias;
+  
+        FOR rec in
+             select table_name
+             from information_schema.tables
+             where table_schema = 'public'
+             order by table_name
+        LOOP
+        
+    execute 'SELECT count(*) FROM ' || rec.table_name INTO quant;
+    
+    IF quant = 0 then
+      INSERT INTO tabelas_vazias values (rec.table_name);
+    ELSE 
+      quant := 0;
+    END IF;
+    
+       END LOOP;
+   
+   return;
+  END;
+  $BODY$
+    LANGUAGE 'plpgsql';
+
+--------------------------------------------------
+select tabelasvazias();
+
+select * from tabelas_vazias
