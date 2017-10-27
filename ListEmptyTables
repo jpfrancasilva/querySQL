@@ -6,6 +6,9 @@ CREATE OR REPLACE FUNCTION tabelasvazias()
   quant integer;
  
   BEGIN
+  	--caso esteja usando uma versão do pg que implemente
+	--create table if not exists, basta adicionar logo abaixo,
+	--e tirar a linha de "drop table..." antes de criar a tabela
 	drop table if exists tabelas_vazias;
 	create table tabelas_vazias(
 		nome_tabela varchar(100)
