@@ -1,0 +1,45 @@
+CREATE OR REPLACE FUNCTION tabelasnaovazias()
+    RETURNS void
+    AS $BODY$
+     DECLARE
+  rec RECORD;
+  quant integer;
+ 
+  BEGIN
+  --caso esteja usando uma versão do pg que implemente
+	--create table if not exists, basta adicionar logo abaixo,
+	--e tirar a linha de "drop table..." antes de criar a tabela.
+  
+	drop table if exists tabelas_nao_vazias;
+	create table tabelas_nao_vazias(
+		nome_tabela varchar(100)
+	);
+	DELETE FROM tabelas_nao_vazias;
+  
+        FOR rec in
+             select table_name
+             from information_schema.tables
+             where table_schema = 'public'
+             order by table_name
+        LOOP
+        
+    execute 'SELECT count(*) FROM ' || rec.table_name INTO quant;
+    
+    IF quant <> 0 then
+      INSERT INTO tabelas_nao_vazias values (rec.table_name);
+      quant := 0;
+    ELSE 
+      quant := 0;
+    END IF;
+    
+       END LOOP;
+   
+   return;
+  END;
+  $BODY$
+    LANGUAGE 'plpgsql';
+
+--------------------------------------------------
+select tabelasnaovazias();
+
+select * from tabelas_nao_vazias
